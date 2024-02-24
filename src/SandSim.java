@@ -1,5 +1,8 @@
 import javax.swing.JPanel;
 import javax.swing.Timer;
+import java.util.Collections;
+import java.util.List;
+import java.util.Arrays;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Color;
@@ -55,7 +58,7 @@ public class SandSim extends JPanel implements ActionListener {
                 if (Math.random() < 0.75) {
                     int col = mouseCol + i;
                     int row = mouseRow + j;
-                    if (withinCols(col) && withinRows(row)) {
+                    if (withinCols(col) && withinRows(row) && grid[col][row] == 0) { //Check if the position is within bounds and empty
                         grid[col][row] = (int)hueValue;
                         velocityGrid[col][row] = 1;
                     }
@@ -101,12 +104,13 @@ public class SandSim extends JPanel implements ActionListener {
                     float velocity = velocityGrid[i][j];
                     boolean moved = false;
 
-                    if (j < rows - 1 && grid[i][j + 1] == 0) { // Check directly below
+                    if (j < rows - 1 && grid[i][j + 1] == 0) { //Check directly below
                         nextGrid[i][j + 1] = state;
                         nextVelocityGrid[i][j + 1] = velocity + gravity;
                         moved = true;
-                    } else { // Check diagonally down-left and down-right
-                        int[] directions = {1, -1};
+                    } else {
+                        List<Integer> directions = Arrays.asList(1, -1);
+                        Collections.shuffle(directions); //Randomize the direction during fall
                         for (int dir : directions) {
                             int nextCol = i + dir;
                             if (withinCols(nextCol) && j < rows - 1 && grid[nextCol][j + 1] == 0) {
@@ -118,9 +122,9 @@ public class SandSim extends JPanel implements ActionListener {
                         }
                     }
 
-                    if (!moved) { // If sand can't move, it stays in the current position
+                    if (!moved) { //Stay in current position if unable to move
                         nextGrid[i][j] = state;
-                        nextVelocityGrid[i][j] = 0; // Reset velocity as it's now static
+                        nextVelocityGrid[i][j] = 0; //Reset velocity as it's now static
                     }
                 }
             }
